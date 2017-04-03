@@ -10,18 +10,49 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener,
+        ValueEventListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Get a reference to firebase database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        // testing reference
+        myRef.setValue("Hello, World");
+
+        myRef.addValueEventListener(this);
+
         ImageView iv = (ImageView) findViewById(R.id.image);
 
         if (iv != null) {
             iv.setOnTouchListener(this);
         }
+    }
+
+    // Called when data is changed and when updated
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+
+        String value = dataSnapshot.getValue(String.class);
+        Log.d("Chelsy", "Value is: " + value);
+    }
+
+    // failed to read value
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
+        Log.d("Chelsy", "Failed to read: " + databaseError.toException());
     }
 
     public boolean onTouch (View v, MotionEvent ev) {
